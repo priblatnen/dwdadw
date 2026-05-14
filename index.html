@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Anarchy Onlitime | Neo-форум с админкой</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', 'Poppins', system-ui, -apple-system;
+        }
+
+        body {
+            background: radial-gradient(ellipse at 10% 20%, #0b0e1a, #020408);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            color: #f0f3fa;
+        }
+
+        /* Главный контейнер с неон-эффектом */
+        .neon-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(8, 12, 22, 0.65);
+            backdrop-filter: blur(14px);
+            border-radius: 3rem;
+            border: 1px solid rgba(255, 180, 60, 0.35);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 160, 60, 0.1);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        /* Хедер с глитчем */
+        .glow-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 1.5rem 2rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 2px solid #ffaa33;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+        .logo h1 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #ffd966, #ff914d);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+            text-shadow: 0 0 5px rgba(255,140,0,0.3);
+        }
+        .logo p {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            letter-spacing: 1px;
+        }
+        .user-panel {
+            background: #11141fcc;
+            backdrop-filter: blur(8px);
+            padding: 0.5rem 1.2rem;
+            border-radius: 60px;
+            border: 1px solid #ffaa4455;
+            display: flex;
+            gap: 1rem;
+            align-items: baseline;
+            flex-wrap: wrap;
+        }
+        .username {
+            font-weight: bold;
+            background: linear-gradient(145deg, #ffcc88, #ffaa55);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .badge-admin {
+            background: #b95f1a;
+            padding: 2px 10px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        button {
+            background: #1f253e;
+            border: none;
+            font-weight: 600;
+            padding: 0.5rem 1.3rem;
+            border-radius: 40px;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.85rem;
+        }
+        button.primary {
+            background: #ff914d;
+            color: #0a0a0a;
+            box-shadow: 0 0 8px #ffaa55;
+        }
+        button.primary:hover {
+            background: #ffaa66;
+            transform: scale(0.96);
+            box-shadow: 0 0 15px #ffaa55;
+        }
+        button.danger {
+            background: #882e2e;
+        }
+
+        /* ТАБЫ — КРАСИВО И РАБОТАЕТ */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            padding: 1rem 2rem 0 2rem;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #2e324b;
+        }
+        .tab-btn {
+            background: rgba(20, 24, 40, 0.7);
+            backdrop-filter: blur(4px);
+            border-radius: 40px 40px 20px 20px;
+            padding: 0.7rem 1.7rem;
+            font-weight: bold;
+            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
+        }
+        .tab-btn.active {
+            background: #ff914d;
+            color: #0a0a0a;
+23:02
+border-bottom: 2px solid #ffdd99;
+            box-shadow: 0 -2px 12px rgba(255,140,0,0.3);
+        }
+
+        /* Панели контента */
+        .tab-pane {
+            display: none;
+            animation: fadeSlide 0.25s ease-out;
+            padding: 2rem;
+        }
+        .tab-pane.active {
+            display: block;
+        }
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Карточки разделов */
+        .glass-card {
+            background: rgba(14, 18, 28, 0.75);
+            backdrop-filter: blur(5px);
+            border-radius: 2rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 170, 80, 0.2);
+        }
+        .section-title {
+            font-size: 1.7rem;
+            font-weight: 700;
+            border-left: 6px solid #ffaa44;
+            padding-left: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .rule-card, .mod-card {
+            background: #0b0e18;
+            margin: 0.8rem 0;
+            padding: 1rem 1.2rem;
+            border-radius: 1.2rem;
+            transition: 0.1s;
+            border-left: 3px solid #ffaa55;
+        }
+        .complaint-item {
+            background: #0e111f;
+            border-radius: 1.2rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #2a2e48;
+        }
+        input, textarea {
+            background: #0a0c16;
+            border: 1px solid #3a3f60;
+            border-radius: 1.2rem;
+            padding: 0.8rem 1rem;
+            width: 100%;
+            margin: 0.6rem 0;
+            color: #f5f5f5;
+            transition: 0.2s;
+        }
+        input:focus, textarea:focus {
+            border-color: #ffaa55;
+            outline: none;
+            box-shadow: 0 0 8px #ffaa5533;
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        hr {
+            border-color: #2e334c;
+            margin: 1rem 0;
+        }
+        .admin-badge-area {
+            background: #1b1a2a;
+            padding: 1rem;
+            border-radius: 1.5rem;
+            margin-top: 1rem;
+        }
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.7rem;
+            opacity: 0.6;
+            border-top: 1px solid #2f334a;
+        }
+        @media (max-width: 700px) {
+            body { padding: 1rem; }
+            .tab-pane { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="neon-container">
+    <div class="glow-header">
+        <div class="logo">
+            <h1>⚡ ONLITIME ANARCHY ⚡</h1>
+            <p>полный хаос • честная модерация • админ sugarwhite</p>
+        </div>
+        <div class="user-panel" id="userWidget">
+            <span id="userNameDisplay">🌀  Гость</span>
+            <button id="authActionBtn" class="primary" style="padding: 0.3rem 1rem;">🔓 Войти</button>
+        </div>
+    </div>
+
+    <!-- НАВИГАЦИЯ - ТАБЫ РАБОТАЮТ ИДЕАЛЬНО -->
+    <div class="tabs" id="tabHeader">
+        <button class="tab-btn active" data-tab="rules">📜  ПРАВИЛА</button>
+        <button class="tab-btn" data-tab="complaints">⚠️  ЖАЛОБЫ</button>
+        <button class="tab-btn" data-tab="mods">🔧  МОДЫ</button>
+        <button class="tab-btn" data-tab="admin" id="adminTabBtn" style="display: none;">👑  АДМИН-ПАНЕЛЬ</button>
+    </div>
+
+    <!-- ПАНЕЛЬ ПРАВИЛ -->
+    <div id="rulesPane" class="tab-pane active">
+        <div class="glass-card">
+            <div class="section-title">📌  НЕПИСАНЫЙ ЗАКОН АНАРХИИ</div>
+            <div class="rule-card">🔥  1. ЗАПРЕЩЕНЫ ЧИТЫ: X-Ray, Fly, Speed, KillAura. Остальное — можно!</div>
+            <div class="rule-card">💣 2. ГРИФИНГ, ВОРОВСТВО, ПВП — ПОЛНАЯ СВОБОДА. Админ не банит за это.</div>
+23:02
+<div class="rule-card">🤬  3. ЖАЛОБЫ ПРИНИМАЮТСЯ ТОЛЬКО НА ЧИТЕРОВ И ОСКОРБЛЕНИЯ В РЕАЛЕ.</div>
+            <div class="rule-card">🧩  4. РАЗРЕШЁННЫЕ МОДЫ — ИСКЛЮЧИТЕЛЬНО ИЗ БЕЛОГО СПИСКА.</div>
+            <div class="rule-card">👑  5. АДМИН SUGARWHITE — ВСЕГДА НА СТРАЖЕ ЧЕСТНОЙ АНАРХИИ.</div>
+        </div>
+    </div>
+
+    <!-- ПАНЕЛЬ ЖАЛОБЫ -->
+    <div id="complaintsPane" class="tab-pane">
+        <div class="glass-card">
+            <div class="section-title">🚨  ЖАЛОБНАЯ КНИГА</div>
+            <div id="complaintsList" style="margin-bottom: 1.5rem;"></div>
+            <div style="background:#0b0e1a; border-radius: 1.5rem; padding: 1.2rem;">
+                <h3>📢  Подать жалобу (читеры/угрозы)</h3>
+                <input type="text" id="complaintPlayer" placeholder="Ник нарушителя">
+                <textarea id="complaintDesc" rows="2" placeholder="Описание, скриншот или видео..."></textarea>
+                <button id="sendComplaintBtn" class="primary">✉️  ОТПРАВИТЬ ЖАЛОБУ</button>
+            </div>
+            <div id="adminComplaintZone" style="display: none; margin-top: 1.5rem; background:#171b2a; border-radius: 1.5rem; padding: 1rem;">
+                <h4>🛠️  Администратор: управление жалобами</h4>
+                <div id="adminComplaintList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ПАНЕЛЬ МОДОВ -->
+    <div id="modsPane" class="tab-pane">
+        <div class="glass-card">
+            <div class="section-title">📦 РАЗРЕШЁННЫЕ МОДЫ (WHITELIST)</div>
+            <div id="modsContainer" class="mod-list"></div>
+            <div id="adminModZone" style="display: none; margin-top: 1.8rem; background:#141825; border-radius: 1.5rem; padding: 1.2rem;">
+                <h4>➕ Админ-панель модов</h4>
+                <div class="flex-between" style="gap: 10px;">
+                    <input type="text" id="newModName" placeholder="Название нового мода" style="flex: 2;">
+                    <button id="addModBtn" class="primary">Добавить мод</button>
+                </div>
+                <div id="adminModDeletePanel" style="margin-top: 1rem;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- АДМИН ПАНЕЛЬ -->
+    <div id="adminPane" class="tab-pane">
+        <div class="glass-card">
+            <div class="section-title">🎛️  ВЫСШАЯ ВЛАСТЬ ONLITIME</div>
+            <div style="background:#0f1220; border-radius: 1.5rem; padding: 1.2rem;">
+                <h3>👥  База игроков</h3>
+                <div id="adminUserTable"></div>
+                <hr>
+                <div class="flex-between" style="gap: 12px; flex-wrap: wrap;">
+                    <button id="adminClearComplaints" class="danger">🗑️  Очистить все жалобы</button>
+                    <button id="adminResetMods" class="danger">🔄  Сбросить моды по умолчанию</button>
+                </div>
+                <p style="margin-top: 1rem; font-size: 0.8rem;">🔐  Вся власть принадлежит администратору sugarwhite.</p>
+            </div>
+        </div>
+    </div>
+    <footer>© ANARCHY ONLITIME — свобода превыше всего, но читы под запретом. | Админ: sugarwhite</footer>
+</div>
+
+<script>
+    // ---------- ДАННЫЕ ----------
+    let usersDB = [];
+    let complaintsDB = [];
+    let modsDB = [];
+
+    let currentUser = null; // { username, role }
+
+    // инициализация / загрузка
+    function loadAllData() {
+        const storedUsers = localStorage.getItem("onlitime_users_final");
+        if(storedUsers) usersDB = JSON.parse(storedUsers);
+        else {
+            usersDB = [
+                { username: "Admin", password: "admin123", role: "admin" },
+                { username: "sugarwhite", password: "sugar123", role: "admin" },
+                { username: "Player", password: "player", role: "user" }
+            ];
+        }
+        const storedComplaints = localStorage.getItem("onlitime_complaints_final");
+        complaintsDB = storedComplaints ? JSON.parse(storedComplaints) : [];
+        const storedMods = localStorage.getItem("onlitime_mods_final");
+23:02
+if(storedMods) modsDB = JSON.parse(storedMods);
+        else modsDB = ["✨ OptiFine", "🗺️  JourneyMap", "📐  Schematica", "🛠️  Litematica", "📦 Mouse Tweaks", "🔊  Sound Physics"];
+        saveToLocal();
+    }
+
+    function saveToLocal() {
+        localStorage.setItem("onlitime_users_final", JSON.stringify(usersDB));
+        localStorage.setItem("onlitime_complaints_final", JSON.stringify(complaintsDB));
+        localStorage.setItem("onlitime_mods_final", JSON.stringify(modsDB));
+    }
+
+    // регистрация
+    function register(username, password) {
+        if(usersDB.find(u => u.username === username)) return { ok: false, msg: "Имя уже занято" };
+        if(password.length < 3) return { ok: false, msg: "Пароль минимум 3 символа" };
+        usersDB.push({ username, password, role: "user" });
+        saveToLocal();
+        return { ok: true };
+    }
+
+    function login(username, password) {
+        const user = usersDB.find(u => u.username === username && u.password === password);
+        if(user) return { ok: true, role: user.role, username: user.username };
+        return { ok: false, msg: "Неверный логин/пароль" };
+    }
+
+    // жалобы
+    function addComplaint(player, desc) {
+        if(!player.trim() || !desc.trim()) return false;
+        complaintsDB.unshift({ id: Date.now(), player: player.trim(), desc: desc.trim(), date: new Date().toLocaleString() });
+        saveToLocal();
+        return true;
+    }
+    function deleteComplaint(id) {
+        complaintsDB = complaintsDB.filter(c => c.id !== id);
+        saveToLocal();
+    }
+    function clearAllComplaints() {
+        complaintsDB = [];
+        saveToLocal();
+    }
+
+    // моды
+    function addMod(name) {
+        if(!name.trim()) return false;
+        modsDB.push(name.trim());
+        saveToLocal();
+        return true;
+    }
+    function removeMod(index) {
+        if(index >= 0 && index < modsDB.length) {
+            modsDB.splice(index, 1);
+            saveToLocal();
+        }
+    }
+    function resetModsToDefault() {
+        modsDB = ["✨ OptiFine", "🗺️  JourneyMap", "📐  Schematica", "🛠️  Litematica", "📦 Mouse Tweaks", "🔊  Sound Physics"];
+        saveToLocal();
+    }
+
+    // UI ОТРИСОВКА
+    function renderComplaints() {
+        const container = document.getElementById("complaintsList");
+        if(!container) return;
+        if(complaintsDB.length === 0) {
+            container.innerHTML = "<div class='complaint-item'>📭 Жалоб нет. Анархия в порядке.</div>";
+        } else {
+            container.innerHTML = complaintsDB.map(c => `
+                <div class="complaint-item">
+                    <div class="flex-between">
+                        <span><strong>🎭 ${escapeHtml(c.player)}</strong></span>
+                        <span style="font-size:0.7rem;">📅  ${c.date}</span>
+                    </div>
+                    <div style="margin-top:8px;">📝  ${escapeHtml(c.desc)}</div>
+                </div>
+            `).join('');
+        }
+        // админ-консоль жалоб
+        const adminZone = document.getElementById("adminComplaintList");
+        if(adminZone && currentUser && currentUser.role === "admin") {
+            if(complaintsDB.length === 0) adminZone.innerHTML = "<i>Жалоб нет</i>";
+            else {
+                adminZone.innerHTML = complaintsDB.map(c => `
+                    <div style="background:#1f1e30; margin:0.5rem 0; padding:0.5rem 1rem; border-radius:1rem; display:flex; justify-content:space-between; align-items:center;">
+                        <span><b>${escapeHtml(c.player)}</b>: ${escapeHtml(c.desc.substring(0, 70))}</span>
+                        <button class="adminDeleteComplaint" data-id="${c.id}" style="background:#8b3c2c;">❌ Удалить</button>
+                    </div>
+                `).join('');
+                document.querySelectorAll('.adminDeleteComplaint').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = parseInt(btn.dataset.id);
+btn.dataset.id
+porkbun.com | parked domain
+dataset.id has been registered at Porkbun but the owner has not put up a site yet. Visit again soon to see what amazing website they decide to build.
+23:02
+deleteComplaint(id);
+                        renderComplaints();
+                        if(document.getElementById("adminPane").classList.contains('active')) renderAdminUsers();
+                        renderMods(); // не обязательно
+                    });
+                });
+            }
+        } else if(adminZone) adminZone.innerHTML = "";
+    }
+
+    function renderMods() {
+        const modContainer = document.getElementById("modsContainer");
+        if(!modContainer) return;
+        if(modsDB.length === 0) modContainer.innerHTML = "<div class='mod-card'>⚙️  Список модов пуст.</div>";
+        else {
+            modContainer.innerHTML = modsDB.map(mod => `<div class="mod-card">📁  ${escapeHtml(mod)}</div>`).join('');
+        }
+
+        const adminModZone = document.getElementById("adminModZone");
+        const adminDelPanel = document.getElementById("adminModDeletePanel");
+        if(adminModZone && currentUser && currentUser.role === "admin") {
+            adminModZone.style.display = "block";
+            if(adminDelPanel) {
+                adminDelPanel.innerHTML = `<h4>🗑️  Удалить мод</h4><div style="display:flex; gap:8px; flex-wrap:wrap;">` +
+                    modsDB.map((mod, idx) => `<button class="removeModBtn" data-index="${idx}" style="background:#5a2e2e;">✖️  ${escapeHtml(mod)}</button>`).join('') +
+                    `</div>`;
+                document.querySelectorAll('.removeModBtn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const idx = parseInt(btn.dataset.index);
+                        removeMod(idx);
+                        renderMods();
+                        if(document.getElementById("adminPane").classList.contains('active')) renderAdminUsers();
+                    });
+                });
+            }
+        } else if(adminModZone) adminModZone.style.display = "none";
+    }
+
+    function renderAdminUsers() {
+        const container = document.getElementById("adminUserTable");
+        if(!container) return;
+        container.innerHTML = `<ul style="list-style:none;">` + usersDB.map(u => `
+            <li style="margin:8px 0; background:#10121e; padding:0.5rem; border-radius:1rem;">👤  ${escapeHtml(u.username)} — ${u.role === 'admin' ? '👑  Администратор' : '🎮 Игрок'}</li>
+        `).join('') + `</ul>`;
+    }
+
+    function updateAuthUI() {
+        const userNameSpan = document.getElementById("userNameDisplay");
+        const authBtn = document.getElementById("authActionBtn");
+        const adminTab = document.getElementById("adminTabBtn");
+        const adminComplaintZoneDiv = document.getElementById("adminComplaintZone");
+        if(currentUser) {
+            userNameSpan.innerHTML = `${currentUser.username} <span style="font-size:0.7rem;">${currentUser.role === 'admin' ? '(Admin ★)' : '(игрок)'}</span>`;
+            authBtn.innerText = "🚪  Выйти";
+            authBtn.onclick = () => logout();
+            if(currentUser.role === "admin") {
+                adminTab.style.display = "inline-block";
+                if(adminComplaintZoneDiv) adminComplaintZoneDiv.style.display = "block";
+            } else {
+                adminTab.style.display = "none";
+                if(adminComplaintZoneDiv) adminComplaintZoneDiv.style.display = "none";
+                if(document.getElementById("adminPane").classList.contains('active')) switchTab('rules');
+            }
+        } else {
+            userNameSpan.innerHTML = "🌙  Гость";
+            authBtn.innerText = "🔑  Вход / Регистрация";
+            authBtn.onclick = () => showAuthModal();
+            adminTab.style.display = "none";
+            if(adminComplaintZoneDiv) adminComplaintZoneDiv.style.display = "none";
+            if(document.getElementById("adminPane").classList.contains('active')) switchTab('rules');
+        }
+        renderComplaints();
+        renderMods();
+        if(currentUser && currentUser.role === "admin") renderAdminUsers();
+    }
+
+    // МОДАЛКА
+23:02
+function showAuthModal() {
+        const modal = document.createElement('div');
+        modal.style.position = 'fixed'; modal.style.top='0'; modal.style.left='0'; modal.style.width='100%'; modal.style.height='100%';
+        modal.style.backgroundColor = 'rgba(0,0,0,0.9)'; modal.style.backdropFilter = 'blur(10px)';
+        modal.style.display = 'flex'; modal.style.alignItems = 'center'; modal.style.justifyContent = 'center'; modal.style.zIndex = '2000';
+        modal.innerHTML = `
+            <div style="background:#11151f; border-radius: 2rem; padding: 2rem; width: 350px; border: 1px solid #ffaa55;">
+                <h2 style="margin-bottom:1rem;">Авторизация</h2>
+                <div id="authModalError" style="color:#ff8866;"></div>
+                <input type="text" id="modalLogin" placeholder="Логин">
+                <input type="password" id="modalPass" placeholder="Пароль">
+                <div style="display: flex; gap: 0.7rem; margin-top: 1.2rem;">
+                    <button id="modalLoginBtn" class="primary">Войти</button>
+                    <button id="modalRegBtn">Регистрация</button>
+                    <button id="modalCloseBtn">Закрыть</button>
+                </div>
+                <p style="font-size:0.7rem; margin-top:1rem;">Тестовые: sugarwhite / sugar123 (админ) | Player / player</p>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        const close = () => modal.remove();
+        document.getElementById('modalCloseBtn').onclick = close;
+        document.getElementById('modalLoginBtn').onclick = () => {
+            const uname = document.getElementById('modalLogin').value.trim();
+            const pwd = document.getElementById('modalPass').value;
+            const res = login(uname, pwd);
+            if(res.ok) {
+                currentUser = { username: res.username, role: res.role };
+                updateAuthUI();
+                close();
+            } else {
+                document.getElementById('authModalError').innerText = res.msg;
+            }
+        };
+        document.getElementById('modalRegBtn').onclick = () => {
+            const uname = document.getElementById('modalLogin').value.trim();
+            const pwd = document.getElementById('modalPass').value;
+            const reg = register(uname, pwd);
+            if(reg.ok) {
+                document.getElementById('authModalError').innerText = "✅ Регистрация успешна! Теперь войдите.";
+                document.getElementById('modalLogin').value = '';
+                document.getElementById('modalPass').value = '';
+            } else {
+                document.getElementById('authModalError').innerText = reg.msg;
+            }
+        };
+    }
+
+    function logout() {
+        currentUser = null;
+        updateAuthUI();
+    }
+
+    // ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК (рабочее!)
+    function switchTab(tabId) {
+        const panes = ['rulesPane', 'complaintsPane', 'modsPane', 'adminPane'];
+        panes.forEach(pane => {
+            const el = document.getElementById(pane);
+            if(el) el.classList.remove('active');
+        });
+        const activePane = document.getElementById(`${tabId}Pane`);
+        if(activePane) activePane.classList.add('active');
+        const allTabs = document.querySelectorAll('.tab-btn');
+        allTabs.forEach(btn => btn.classList.remove('active'));
+        const activeBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+        if(activeBtn) activeBtn.classList.add('active');
+        
+        if(tabId === 'admin' && (!currentUser || currentUser.role !== 'admin')) {
+            switchTab('rules');
+            alert("Только администратор имеет доступ! Войдите как sugarwhite / admin123");
+            return;
+        }
+        if(tabId === 'complaints') renderComplaints();
+        if(tabId === 'mods') renderMods();
+        if(tabId === 'admin' && currentUser?.role === 'admin') renderAdminUsers();
+    }
+23:02
+function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+
+    // Биндинги
+    function bindEvents() {
+        document.getElementById("sendComplaintBtn")?.addEventListener("click", () => {
+            if(!currentUser) { alert("Сначала войдите в аккаунт!"); showAuthModal(); return; }
+            const player = document.getElementById("complaintPlayer").value;
+            const desc = document.getElementById("complaintDesc").value;
+            if(addComplaint(player, desc)) {
+                document.getElementById("complaintPlayer").value = "";
+                document.getElementById("complaintDesc").value = "";
+                renderComplaints();
+                alert("Жалоба отправлена администрации.");
+            } else alert("Заполните оба поля (ник и описание)");
+        });
+        document.getElementById("addModBtn")?.addEventListener("click", () => {
+            if(!currentUser || currentUser.role !== "admin") { alert("Нет прав"); return; }
+            const newMod = document.getElementById("newModName").value;
+            if(addMod(newMod)) { document.getElementById("newModName").value = ""; renderMods(); }
+            else alert("Введите название мода");
+        });
+        document.getElementById("adminClearComplaints")?.addEventListener("click", () => {
+            if(currentUser?.role === "admin") { clearAllComplaints(); renderComplaints(); alert("Жалобы удалены"); }
+            else alert("Нет прав");
+        });
+        document.getElementById("adminResetMods")?.addEventListener("click", () => {
+            if(currentUser?.role === "admin") { resetModsToDefault(); renderMods(); alert("Стандартные моды восстановлены"); }
+            else alert("Нет прав");
+        });
+        // навигация по табам
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const tab = btn.getAttribute('data-tab');
+                if(tab) switchTab(tab);
+            });
+        });
+    }
+
+    loadAllData();
+    bindEvents();
+    updateAuthUI();
+    // дополнительная проверка для sugarwhite (для надежности)
+    if(!usersDB.find(u => u.username === "sugarwhite")) {
+        usersDB.push({ username: "sugarwhite", password: "sugar123", role: "admin" });
+        saveToLocal();
+    }
+    renderMods();
+    renderComplaints();
+</script>
+</body>
+</html>
+23:02
+
+
+
+
+
